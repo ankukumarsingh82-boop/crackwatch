@@ -1,6 +1,6 @@
 # CrackWatch
 
-**Live demo:** https://raw.githack.com/ankukumarsingh82-boop/crackwatch/LIVE_COMMIT/index.html
+**Live demo:** https://raw.githack.com/ankukumarsingh82-boop/crackwatch/7f4c5ef2a36b3d2e034926c225c4b446aca18a7c/index.html
 
 The first visit asks you to press **Open the page**. The plaster sample loads in pixels and does not show a risk rating. Open **Demo: coin close-up** and press **Use the coin in this demo (27 mm)** for a rating in millimetres.
 

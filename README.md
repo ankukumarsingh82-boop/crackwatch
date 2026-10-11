@@ -10,7 +10,7 @@ It is a screening aid. It is not a structural inspection, and it does not replac
 
 Live demo, pinned to this build (the first visit asks you to press **Open the page**):
 
-https://raw.githack.com/ankukumarsingh82-boop/crackwatch/LIVE_COMMIT/index.html
+https://raw.githack.com/ankukumarsingh82-boop/crackwatch/7f4c5ef2a36b3d2e034926c225c4b446aca18a7c/index.html
 
 The plaster sample loads on its own and stays in pixels. It does not show a risk rating. Open **Demo: coin close-up** and press **Use the coin in this demo (27 mm)** for a rating in millimetres. The “long edge = 30 cm” button only keeps the pixel sizes.
 
