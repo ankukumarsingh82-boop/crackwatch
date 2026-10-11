@@ -1,45 +1,47 @@
-# CrackWatch — demo script (about 2:40–2:55)
+# CrackWatch — demo script (about 2:35–2:50)
 
-Read this aloud at a steady pace, roughly 140 to 150 words a minute. The spoken part is about 400 words. The page should already be open on the live link in the README. The first visit on that host asks you to press **Open the page**. The plaster sample then loads by itself.
+Read this aloud at a steady pace. The spoken part is about 380 words. Have the live page open before you start. On the first visit, press **Open the page**. The plaster photo loads by itself. Leave the crack outline on.
+
+## Shot list
+
+1. **Problem.** Stay on the plaster photo. Do not click yet.
+2. **Real crack.** Point at the coloured outline. Toggle **Show crack** off and on once.
+3. **Wood grain.** Click **Wood grain**. Wait until the card says **No clear crack found — try a closer photo**.
+4. **Scale and rating.** Click **Synthetic: drawn coin**. Press **Apply the 27 mm scale**. The badge should say **Monitor**, about 0.75 mm wide.
+5. **How it works.** Stay on that card. Point at the length and the width.
+6. **Limitations.** Point at the disclaimer under the rating. Do not open the growth check.
 
 ---
 
-**0:00 — Inspiration**
+**0:00 — Problem**
 
-This is CrackWatch, for Banana Hacks.
+A crack shows up in the plaster, and the people in the flat are not sure if it can wait. The tool they have is a phone. CrackWatch is a first look at that photo. It is not an engineer. That line stays on the card.
 
-It started from a crack in the plaster, and the argument that follows in a lot of Indian homes: is this nothing, or do we call someone? On a Sunday evening the tool people have is a phone. CrackWatch is that first look. It outlines the crack, measures it against a coin, and writes down the rule. It is not an engineer. That line stays on the card.
+**0:20 — A real crack**
 
-**0:28 — How it was designed**
+This first picture is a real photo of a plaster wall, by Nolan Issac. The coloured line is the outline of the cracks. I can turn it off and on. The numbers underneath are pixels. There is no rating yet, because the photo has no known length in it.
 
-The plaster photo is open. The coloured line is a crack filter, not a chatbot. A black-hat filter lifts thin dark lines. A ridge filter drops round texture, like plaster grain.
+**0:48 — Wood grain**
 
-A confidence check then throws the mask away if the lines are short, repeated, or pointing every which way. Brick, wood grain, ivy and a bundle of wires come back as “No clear crack found — try a closer photo.” No direction, and no rating.
+This next picture is wood grain. We drew it. It is full of dark lines, and it is not a crack. The card says “No clear crack found — try a closer photo.” The outline is gone. A pattern like this should not get a rating.
 
-The numbers under this photo are pixels. There is no rating yet.
+**1:12 — Scale, then a rating**
 
-**1:12 — The product, with a real scale**
+This sample is synthetic. It is not a real photo, and the app does not find the coin. The pale disc is drawn, and we already know it stands for 27 millimetres. I press **Apply the 27 mm scale**. That is the same step as tapping two points a known distance apart.
 
-A rating needs a scale. The “30 centimetres” button only keeps the pixel sizes. It will not invent millimetres.
+The length and the width are now in millimetres, and the badge is a rating. Under 0.3 millimetres, and straight, is a hairline. From 0.3 to 3 is monitor. Over 3, or a diagonal or a stair-step, says see a structural engineer. This one is monitor, about 0.75 millimetres wide.
 
-I open **Demo: coin close-up**. The pale disc is a ten-rupee coin, 27 millimetres, drawn so we know the length. I press **Use the coin in this demo**.
+**1:52 — How it works**
 
-Length and width are now in millimetres, and the badge is a real rating. Under 0.3 millimetres, straight, is a hairline. From 0.3 to 3 is monitor. Over 3, or a diagonal or a stair-step, says see a structural engineer. On a real wall I tap the two sides of a coin. That button is “Tap two points on the photo.”
+No photo is sent to an AI service. A black-hat filter lifts thin dark lines. A ridge filter drops round specks. Another check throws away lines that are short, repeated, or pointing every which way. Length follows the centre of the line. Width is how wide the dark dip is. The rating uses those rules, and only after a known length is set.
 
-**2:05 — Resources, and one more photo**
+**2:22 — Limitations**
 
-The other pictures are open photos, credited on the card: Nolan Issac, Kilfane Church, Exeter, and a stepped crack in Tbilisi.
-
-Kilfane comes back diagonal, about 45 degrees. Direction matters as well as width. The maths is Frangi’s ridge filter, Zhang–Suen thinning, and a width read across the dark dip. Growth, at the bottom, is beta. It uses OpenCV and gives up after 10 seconds if the library does not start.
-
-**2:32 — Close**
-
-I would not vacate a building from this screen. I would use it to decide whether to watch the crack, or to call someone who can stand in the room.
+The width is a rough estimate. A faint crack needs a closer photo. A long dark mark that is not a crack can still be outlined. I would use this to decide whether to watch the crack, or to call someone who can stand in the room.
 
 ---
 
 ## If something misbehaves
 
-- The card says “No clear crack found”: open the plaster sample or the coin demo, or raise sensitivity.
-- You want a rating: open **Demo: coin close-up** and press **Use the coin in this demo (27 mm)**. The 30 cm button will not rate the crack.
-- Growth spins: it is beta. After 10 seconds it should stop with a message. Skip to the close.
+- Wood grain still shows an outline: say the line aloud anyway, and move to the drawn coin.
+- The rating is missing: you are on **Synthetic: drawn coin**, then press **Apply the 27 mm scale**. The 30 cm button does not rate the crack.

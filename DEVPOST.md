@@ -1,70 +1,84 @@
 # CrackWatch
 
-**Live demo:** https://raw.githack.com/ankukumarsingh82-boop/crackwatch/a3fa643608a4afd3f6c113a8fb6db0767af0ba3c/index.html
+**Live demo:** https://raw.githack.com/ankukumarsingh82-boop/crackwatch/COMMIT_PIN/index.html
 
-The first visit asks you to press **Open the page**. The plaster sample loads in pixels and does not show a risk rating. Open **Demo: coin close-up** and press **Use the coin in this demo (27 mm)** for a rating in millimetres.
+The first visit asks you to press **Open the page**.
 
-https://ankukumarsingh82-boop.github.io/crackwatch/ redirects away and does not load. Use the link above.
-
----
+1. The plaster photo loads with an outline and pixel sizes. There is no rating yet.
+2. **Wood grain** is a picture we drew. It should say **No clear crack found — try a closer photo**.
+3. **Synthetic: drawn coin** is not a photograph, and the disc is not detected. Press **Apply the 27 mm scale** to enter that known length. The badge should say **Monitor**.
 
 ## Inspiration
 
-In a lot of Indian homes the first structural question is not abstract. It is a line in the plaster, a stair-step in a brick pier, a crack above a door in a housing society, and a family argument about whether it can wait. Engineers are the right people to answer that. Phones are what people actually have on a Sunday evening.
+In a lot of Indian homes the first structural question is a line in the plaster, a crack above a door, and a family argument about whether it can wait. Engineers are the right people to answer that. A phone is what people actually have on a Sunday evening.
 
-CrackWatch started from that gap: a photo, a coin everyone has in a pocket, and a rating with the rules written out, so “it looks bad” becomes a number you can photograph again next month.
+CrackWatch started from that gap: a photo, a known length such as a coin, and a rating with the rule written out, so “it looks bad” becomes a number you can photograph again next month.
 
-## What it does
+## Brainstorming
 
-- Outlines a crack on the photo, pixel by pixel, in the browser.
-- Refuses the outline when the marks look like texture: short pieces, repeated lines (wood grain, cables, brick joints), or strokes pointing in conflicting directions. The card says “No clear crack found — try a closer photo.”
-- Estimates length along the centreline and width across the dark dip. Until you set a scale, those numbers stay in pixels.
-- Converts pixels to millimetres only from a ₹10 coin (27 mm), a ₹5 coin, or any known length you tap. A “30 cm across the long edge” control does not produce a rating.
-- Includes a drawn close-up with a 27 mm disc, and one button that applies that coin, so the demo can show a genuine rating.
-- Rates the crack: hairline (under 0.3 mm), monitor (0.3–3 mm), or see a structural engineer (over 3 mm, or a diagonal or stair-step pattern).
-- Offers a beta growth check: an older photo and a newer one, aligned with ORB and a homography. If OpenCV.js does not start within 10 seconds, the page says so and the single-photo check still works.
-- Ships with credited sample photos so it can be tried with no camera.
+We wanted one job: look at a crack and say how serious it looks, in words a household can use. The first idea was to send the photo to a general vision model. That would have been a caption, not a measurement, and it would have needed an API key. We dropped it.
 
-## How we built it
+The path we kept is classical computer vision in the browser. A filter finds thin dark lines. A second check throws away texture. Pixels become millimetres only when the user supplies a known length. The rules are hairline, monitor, or see an engineer, and the reason is on the screen.
 
-The whole app is static HTML, CSS and JavaScript, so it runs with no API key and no server. That constraint ruled out sending the photo to a general vision model, which was also the wrong tool: the result has to be a measurement, not a caption.
+Two samples are drawn so a judge can try this without a camera. Wood grain is there to show a rejection. The coin picture is there so the known-length step can be pressed once. It is not a detector looking for a coin.
 
-Segmentation is a classical crack pipeline. A multi-scale morphological black-hat lifts thin dark lines. A Frangi ridge filter, the same family of filter used on blood vessels, rejects round texture such as plaster grain. Hysteresis thresholding and an elongation check drop stains and shadows. A second gate then looks at the lines that survived: how long the longest collinear run is, how many similar runs sit beside it, and whether they share a direction. Texture fails that gate. A real crack does not.
+## Design process
 
-Length uses Zhang–Suen thinning, with diagonal steps counted as √2. Width is a half-depth profile across the centreline, because the binary mask is wider than the crack. Risk rules are pure functions, tested at the 0.3 mm and 3 mm boundaries, and around what counts as a stair-step (one stepped path, not two unrelated cracks). Only a coin or a two-point scale is allowed to turn those pixels into a badge.
+The page is static HTML, CSS and JavaScript. The photo never leaves the phone.
 
-The growth check is the piece that uses a library: OpenCV.js 4.9, loaded on demand, for ORB features and a RANSAC homography. It is labelled beta. The build is about 10 MB, which is too large to bundle, so it stays on the OpenCV host with a 10 second timeout. A one-pixel margin stops a small change in camera position from looking like movement.
+Segmentation follows the shape of a crack. A multi-scale black-hat lifts thin dark lines. A Frangi ridge filter, the kind used on blood vessels, drops round texture such as plaster grain. Hysteresis and an elongation check remove stains. A confidence check then looks at what is left: the longest collinear run, how many similar runs sit beside it, and whether they share a direction. Repeated grain fails that check. The card says no clear crack was found, and it does not invent a pattern or a rating.
 
-The interface is mobile-first, because the photo will be taken in a corridor. The rating, the three numbers, and the reason are on one card. The disclaimer stays on that card.
+Length is a Zhang–Suen centreline, with diagonal steps counted as √2. Width is the dark dip across that line, not the thickness of the mask. The widest point used for the rating is the 90th percentile, so one junction does not set the number.
 
-## Challenges
+A rating needs a scale. The user taps a ₹10 coin (27 mm), a ₹5 coin, or any two points of known length. A “30 cm across the long edge” control keeps the numbers in pixels and does not rate. On the synthetic sample, **Apply the 27 mm scale** fills in the diameter we drew. The app does not search the picture for a coin.
 
-Phone photos of walls are not the road-crack datasets most pretrained segmenters are trained on. A small network trained on asphalt would have been a worse fit, and training one properly was not going to be honest inside a hackathon window. The hand-built pipeline is weaker on rough concrete and on mortar that is fused to a real crack, and stronger on a crack in smooth plaster. We tested it on openly licensed photographs and on synthetic brick, wood grain, foliage, wires and stucco, and we kept the failures in the limitations.
+The growth check is separate and marked beta. It loads OpenCV.js only when asked, aligns two photos with ORB and a homography, and stops after 10 seconds if the library does not start.
 
-Width was the other trap. Measuring the binary mask reported almost every crack as several millimetres wide. Moving the measurement onto the greyscale dip, and reporting a typical width beside the widest point, made the number follow the crack instead of the outline.
+## Resources
 
-A third trap was scale. Treating the long edge of the photo as 30 cm produced confident millimetre ratings that were not measurements. The badge now waits for a coin or two tapped points. The drawn coin sample is there so a judge can still see a real rating in one click.
+No paid model and no vision API.
 
-## Accomplishments that we're proud of
+Methods and libraries:
 
-- A crack tool that runs in the browser, with the maths and the no-crack gate tested.
-- Ratings a person can argue with, because the rule that fired is on the screen, and because a fake scale cannot fire a rule.
-- Sample photos with names, licences and sources, plus a drawn coin close-up so the demo is not a blank upload box.
+- Alejandro F. Frangi, Wiro J. Niessen, Koen L. Vincken, Max A. Viergever. *Multiscale vessel enhancement filtering.* MICCAI 1998.
+- T. Y. Zhang and C. Y. Suen. *A fast parallel algorithm for thinning digital patterns.* Communications of the ACM, 1984.
+- Pedro F. Felzenszwalb and Daniel P. Huttenlocher. *Distance Transforms of Sampled Functions.* Theory of Computing, 2012.
+- OpenCV.js 4.9, Apache 2.0, loaded on demand for the beta growth check. https://opencv.org and https://docs.opencv.org/4.9.0/opencv.js
 
-## What we learned
+Coin diameters used as the reference lengths: the current ₹10 coin is 27 mm. ₹5 coins are 23 mm, or 25 mm from 2019. Reserve Bank of India coin specifications.
 
-A coin in the frame matters more than a fancier model. Without a scale, a beautiful outline is still just pixels. And a detector that calls every dark line a crack will rate ivy, wood grain and power lines as if the building were moving.
+Photographs, so the demo can start without a camera:
 
-## What's next
+| Photo | Author | Licence | Source |
+| --- | --- | --- | --- |
+| Plaster wall | Nolan Issac | CC0 | https://commons.wikimedia.org/wiki/File:Cracked_Cream_Walls_(Unsplash).jpg |
+| Stepped crack, Tbilisi | Vladimer Shioshvili | CC BY-SA 2.0 | https://commons.wikimedia.org/wiki/File:Crack_in_the_wall.jpg |
+| Kilfane Church wall | A.-K. D. | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Crack_in_the_wall_(44892).jpg |
+| Larkbeare Road, Exeter | David Smith / Geograph Britain and Ireland | CC BY-SA 2.0 | https://commons.wikimedia.org/wiki/File:Crack_in_the_wall,_Larkbeare_Road,_Exeter_-_geograph.org.uk_-_5058687.jpg |
 
-- A closer capture guide: how near, how square, where to put the coin.
-- Letting the user erase a grout line or a cable from the mask before the rating.
-- A smaller growth check that does not depend on a 10 MB download.
+Drawn by us, MIT, not photographs:
 
-## Built with
+- `samples/wood-grain.jpg` — parallel grain, for the rejection case.
+- `samples/coin-demo.jpg` — a crack and a disc whose diameter is 27 mm in the scale step. The disc is not detected.
 
-HTML, CSS, JavaScript. Frangi vesselness (MICCAI 1998), Zhang–Suen thinning (1984), the Felzenszwalb distance transform (2012). OpenCV.js 4.9 (Apache 2.0) for the beta growth check. Sample photographs by Nolan Issac (CC0), Vladimer Shioshvili (CC BY-SA 2.0), A.-K. D. (CC BY-SA 4.0), and David Smith / Geograph (CC BY-SA 2.0). Coin diameters from Reserve Bank of India specifications: ₹10 is 27 mm.
+## Final product
 
-## Disclaimer
+CrackWatch is a phone-friendly page. You open a photo or a sample. It outlines a crack, or it says none was found. You set a known length. It shows length, typical width, the widest point, the pattern, and a rating with the reason: hairline under 0.3 mm, monitor from 0.3 to 3 mm, or see a structural engineer above 3 mm or for a diagonal or stair-step pattern.
 
-CrackWatch is not a structural inspection and not a substitute for a qualified structural engineer.
+On the live demo, do this:
+
+1. Plaster photo: outline on, sizes in pixels, no rating.
+2. Wood grain: **No clear crack found — try a closer photo**.
+3. Synthetic drawn coin: **Apply the 27 mm scale**. Expect **Monitor**, about 0.75 mm wide.
+
+The disclaimer stays on the card. The page does not replace a structural engineer.
+
+## Limitations
+
+- It is a screening aid. Lighting, focus, angle and the reference all change the numbers.
+- A hairline only shows up in a close photo. Across a whole wall it can be a fraction of a pixel.
+- Width is read from the dark dip. Blur and shadow push it wider. Repeat the reading with the same reference and the same distance.
+- Repeated grain is rejected. One long dark mark that is not a crack can still be outlined. On the Tbilisi photo, mortar beside the crack is still outlined.
+- The drawn coin sample is not a photograph and not a coin detector. The 27 mm value is a scale step we labelled.
+- The 30 cm control never produces a rating.
+- The growth check is beta. It needs two photos of the same wall, downloads about 10 MB, and gives up after 10 seconds if OpenCV.js does not start.

@@ -90,7 +90,7 @@ async function loadImage(image, credit, demoScale = null) {
   state.sourceHeight = image.naturalHeight || image.height;
   $("use-demo").hidden = true;
   $("scale-note").textContent = demoScale
-    ? "This demo has a ₹10 coin drawn on the wall. Use it for a real rating, or tap the two sides yourself."
+    ? "Synthetic sample, not a photograph. The disc is drawn and is not detected. Apply the 27 mm scale, or tap the two sides of the disc yourself."
     : "No scale set. Add a coin or tap a known length for a risk rating.";
   const size = fitSize(image.naturalWidth || image.width, image.naturalHeight || image.height, 1400);
   const display = document.createElement("canvas");

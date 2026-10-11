@@ -10,11 +10,9 @@ It is a screening aid. It is not a structural inspection, and it does not replac
 
 Live demo, pinned to this build (the first visit asks you to press **Open the page**):
 
-https://raw.githack.com/ankukumarsingh82-boop/crackwatch/a3fa643608a4afd3f6c113a8fb6db0767af0ba3c/index.html
+https://raw.githack.com/ankukumarsingh82-boop/crackwatch/COMMIT_PIN/index.html
 
-The plaster sample loads on its own and stays in pixels. It does not show a risk rating. Open **Demo: coin close-up** and press **Use the coin in this demo (27 mm)** for a rating in millimetres. The “long edge = 30 cm” button only keeps the pixel sizes.
-
-https://ankukumarsingh82-boop.github.io/crackwatch/ redirects to a custom domain and does not load. Use the link above.
+The plaster photo loads on its own and stays in pixels. **Wood grain** is a drawn texture and should say no clear crack was found. **Synthetic: drawn coin** is not a photograph and does not detect a coin. Press **Apply the 27 mm scale** to use that known length. The “long edge = 30 cm” button only keeps the pixel sizes.
 
 ## Why it matters
 
@@ -43,7 +41,7 @@ The scale comes from something in the same plane as the crack:
 - a ₹5 coin, 25 mm (2019 onwards) or 23 mm (older coins still in circulation)
 - any two points whose real distance you know
 
-Millimetres per pixel = known length ÷ pixel distance. The camera should be square to the wall. Only that scale produces millimetres and a risk badge. The “long edge = 30 cm” control leaves the measurements in pixels and a note of how wide the line is relative to the frame. It does not rate the crack. The bundled **Demo: coin close-up** is a drawn wall with a 27 mm disc; one button applies that diameter.
+Millimetres per pixel = known length ÷ pixel distance. The camera should be square to the wall. Only that scale produces millimetres and a risk badge. The “long edge = 30 cm” control leaves the measurements in pixels and a note of how wide the line is relative to the frame. It does not rate the crack. **Synthetic: drawn coin** is a picture we drew, not a photograph. The pale disc is not found by the app. **Apply the 27 mm scale** enters that known length, the same step as tapping two points.
 
 **Length.** The mask is thinned to a one-pixel centreline (Zhang–Suen, 1984). Orthogonal steps count as 1 px and diagonal steps as √2, so a slanted crack is not short-changed.
 
@@ -89,7 +87,8 @@ Sample photographs, bundled so the demo works without a camera:
 | Stepped crack, Tbilisi | Vladimer Shioshvili | CC BY-SA 2.0 | https://commons.wikimedia.org/wiki/File:Crack_in_the_wall.jpg |
 | Kilfane Church wall | A.-K. D. | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Crack_in_the_wall_(44892).jpg |
 | Larkbeare Road, Exeter | David Smith / Geograph Britain and Ireland | CC BY-SA 2.0 | https://commons.wikimedia.org/wiki/File:Crack_in_the_wall,_Larkbeare_Road,_Exeter_-_geograph.org.uk_-_5058687.jpg |
-| Demo: coin close-up | CrackWatch (drawn) | MIT | `samples/coin-demo.jpg` — a pale disc of known diameter, not a photograph |
+| Wood grain | CrackWatch (drawn) | MIT | `samples/wood-grain.jpg` — synthetic texture, for the “no clear crack” case |
+| Synthetic: drawn coin | CrackWatch (drawn) | MIT | `samples/coin-demo.jpg` — a drawn disc of known diameter. Not a photograph, and not automatic coin detection |
 
 ## Limitations
 
