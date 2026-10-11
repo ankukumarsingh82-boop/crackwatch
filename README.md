@@ -75,7 +75,7 @@ Methods:
 - Alejandro F. Frangi, Wiro J. Niessen, Koen L. Vincken, Max A. Viergever. *Multiscale vessel enhancement filtering.* MICCAI 1998. The ridge filter used to separate cracks from round texture.
 - T. Y. Zhang and C. Y. Suen. *A fast parallel algorithm for thinning digital patterns.* Communications of the ACM, 1984.
 - Pedro F. Felzenszwalb and Daniel P. Huttenlocher. *Distance Transforms of Sampled Functions.* Theory of Computing, 2012. Used for the geometric width check.
-- OpenCV, Apache 2.0, for ORB and homography in the growth check. https://opencv.org
+- OpenCV, Apache 2.0, for ORB and homography in the growth check. https://github.com/opencv/opencv
 
 Coin diameters: the current ₹10 coin is 27 mm; ₹5 coins are 23 mm (older) or 25 mm (2019 onwards). Reserve Bank of India coin specifications.
 

@@ -43,7 +43,7 @@ Methods and libraries:
 - Alejandro F. Frangi, Wiro J. Niessen, Koen L. Vincken, Max A. Viergever. *Multiscale vessel enhancement filtering.* MICCAI 1998.
 - T. Y. Zhang and C. Y. Suen. *A fast parallel algorithm for thinning digital patterns.* Communications of the ACM, 1984.
 - Pedro F. Felzenszwalb and Daniel P. Huttenlocher. *Distance Transforms of Sampled Functions.* Theory of Computing, 2012.
-- OpenCV.js 4.9, Apache 2.0, loaded on demand for the beta growth check. https://opencv.org and https://docs.opencv.org/4.9.0/opencv.js
+- OpenCV.js 4.9, Apache 2.0, loaded on demand for the beta growth check. https://github.com/opencv/opencv and https://docs.opencv.org/4.9.0/opencv.js
 
 Coin diameters used as the reference lengths: the current ₹10 coin is 27 mm. ₹5 coins are 23 mm, or 25 mm from 2019. Reserve Bank of India coin specifications.
 
