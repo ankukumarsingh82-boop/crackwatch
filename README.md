@@ -6,6 +6,16 @@ You take a picture. The page outlines the crack, estimates its length and its wi
 
 It is a screening aid. It is not a structural inspection, and it does not replace an engineer.
 
+## Try it
+
+The site is static and is published on the `gh-pages` branch. Until GitHub Pages is switched on for the repository, the same files are served here:
+
+https://raw.githack.com/ankukumarsingh82-boop/crackwatch/gh-pages/index.html
+
+The first visit shows that host’s “Open the page” notice. After that, the plaster sample loads on its own. Choose **Use 30 cm across the long edge** to see a rating. That scale is labelled illustrative: it is not measured from the picture.
+
+The intended GitHub Pages address is https://ankukumarsingh82-boop.github.io/crackwatch/ . In the repository settings, set Pages to deploy from the `gh-pages` branch, folder `/`.
+
 ## Why it matters
 
 Hairline plaster cracks are common and often harmless. A crack that is widening, or one that runs diagonally or stair-steps through brickwork, can mean the building is moving. People usually have a phone and not a crack gauge. CrackWatch is a first look: measure it the same way next month, and know when the photo is no longer enough.
@@ -57,7 +67,7 @@ An older photo and a newer photo are aligned with ORB features and a RANSAC homo
 - Static HTML, CSS and JavaScript. No build step and no server.
 - The segmentation, skeleton, distance transform and width profile are plain JavaScript, so the measurement can be tested in Node.
 - [OpenCV.js](https://docs.opencv.org/4.9.0/opencv.js) 4.9 is loaded only when you run the growth check.
-- Hosted as a static site (GitHub Pages).
+- Hosted as a static site from the `gh-pages` branch (GitHub Pages, or the link above until Pages is enabled).
 
 ## Credits
 
