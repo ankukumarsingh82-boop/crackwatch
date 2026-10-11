@@ -88,7 +88,7 @@ async function loadImage(image, credit, demoScale = null) {
   state.demoScale = demoScale;
   state.sourceWidth = image.naturalWidth || image.width;
   state.sourceHeight = image.naturalHeight || image.height;
-  $("use-demo").hidden = !demoScale;
+  $("use-demo").hidden = true;
   $("scale-note").textContent = demoScale
     ? "This demo has a ₹10 coin drawn on the wall. Use it for a real rating, or tap the two sides yourself."
     : "No scale set. Add a coin or tap a known length for a risk rating.";
@@ -103,6 +103,7 @@ async function loadImage(image, credit, demoScale = null) {
   $("empty").hidden = true;
   $("credit-line").textContent = credit || "";
   await analyse();
+  $("use-demo").hidden = !state.demoScale;
 }
 
 function procImage() {
