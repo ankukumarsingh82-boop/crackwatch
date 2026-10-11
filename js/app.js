@@ -1,5 +1,5 @@
 import { measureCrack } from "./measure.js";
-import { classifyRisk, detectPattern, rulesSummary } from "./risk.js";
+import { NO_CRACK_RESULT, classifyRisk, detectPattern, rulesSummary, scaleAllowsRating } from "./risk.js";
 import { segmentCrack } from "./segment.js";
 import { compareGrowth } from "./growth.js";
 import { SAMPLES } from "./samples.js";
@@ -30,6 +30,9 @@ const state = {
   referenceMm: 27,
   credit: "",
   busy: false,
+  demoScale: null,
+  sourceWidth: 0,
+  sourceHeight: 0,
 };
 
 const older = { image: null };
@@ -77,12 +80,18 @@ function readFile(file) {
   });
 }
 
-async function loadImage(image, credit) {
+async function loadImage(image, credit, demoScale = null) {
   state.credit = credit || "";
   state.points = [];
   state.scale = null;
   state.armed = false;
-  $("scale-note").textContent = "No scale set.";
+  state.demoScale = demoScale;
+  state.sourceWidth = image.naturalWidth || image.width;
+  state.sourceHeight = image.naturalHeight || image.height;
+  $("use-demo").hidden = !demoScale;
+  $("scale-note").textContent = demoScale
+    ? "This demo has a ₹10 coin drawn on the wall. Use it for a real rating, or tap the two sides yourself."
+    : "No scale set. Add a coin or tap a known length for a risk rating.";
   const size = fitSize(image.naturalWidth || image.width, image.naturalHeight || image.height, 1400);
   const display = document.createElement("canvas");
   display.width = size.width;
@@ -148,7 +157,7 @@ async function analyse() {
 }
 
 function scaled(px) {
-  if (!state.scale || !state.segmentation) return null;
+  if (!scaleAllowsRating(state.scale?.mode) || !state.segmentation || state.scale.mmPerPx == null) return null;
   const factor = canvas.width / state.segmentation.width;
   return px * factor * state.scale.mmPerPx;
 }
@@ -158,29 +167,28 @@ function publish() {
   const measured = state.measured;
   if (!segmentation || !measured) return;
 
-  const empty = segmentation.pixels < 30;
-  const maxWidthMm = scaled(measured.maxWidthPx);
-  const typicalMm = scaled(measured.medianWidthPx);
-  const lengthMm = scaled(measured.lengthPx);
-  state.risk = empty
-    ? {
-        level: "empty",
-        title: "No clear crack",
-        summary:
-          "Nothing thin and darker than the surrounding surface stood out. Move closer, raise sensitivity, or make sure the crack is in the frame.",
-        reasons: ["The filter looks for an elongated dark line. Texture alone is not enough."],
-      }
+  const rejected = segmentation.accepted === false || segmentation.pixels < 30;
+  const maxWidthMm = rejected ? null : scaled(measured.maxWidthPx);
+  const typicalMm = rejected ? null : scaled(measured.medianWidthPx);
+  const lengthMm = rejected ? null : scaled(measured.lengthPx);
+  state.risk = rejected
+    ? NO_CRACK_RESULT
     : classifyRisk({ maxWidthMm, pattern: state.pattern.pattern });
 
   const badge = $("badge");
   badge.className = `badge badge-${state.risk.level}`;
   $("badge-title").textContent = state.risk.title;
   $("badge-summary").textContent = state.risk.summary;
-  $("stat-length").textContent = lengthMm == null ? `${Math.round(measured.lengthPx)} px` : formatMm(lengthMm);
-  $("stat-typical").textContent = typicalMm == null ? `${measured.medianWidthPx.toFixed(1)} px` : formatMm(typicalMm);
-  $("stat-width").textContent = maxWidthMm == null ? `${measured.maxWidthPx.toFixed(1)} px` : formatMm(maxWidthMm);
-  $("stat-pattern").textContent = empty ? "—" : PATTERN_LABEL[state.pattern.pattern] || "Unclear";
-  $("pattern-line").textContent = empty ? "" : state.pattern.summary || "";
+  const edge = Math.max(segmentation.width, segmentation.height);
+  $("stat-length").textContent = rejected ? "—" : lengthMm == null ? `${Math.round(measured.lengthPx)} px` : formatMm(lengthMm);
+  $("stat-typical").textContent = rejected ? "—" : typicalMm == null ? `${measured.medianWidthPx.toFixed(1)} px` : formatMm(typicalMm);
+  $("stat-width").textContent = rejected
+    ? "—"
+    : maxWidthMm == null
+      ? `${measured.maxWidthPx.toFixed(1)} px`
+      : formatMm(maxWidthMm);
+  $("stat-pattern").textContent = rejected ? "—" : PATTERN_LABEL[state.pattern.pattern] || "Unclear";
+  $("pattern-line").textContent = rejected ? "" : state.pattern.summary || "";
 
   const reasons = $("reasons");
   reasons.replaceChildren();
@@ -189,9 +197,10 @@ function publish() {
     item.textContent = reason;
     reasons.appendChild(item);
   }
-  if (state.scale?.mode === "illustrative") {
+  if (!rejected && maxWidthMm == null && measured.lengthPx) {
     const item = document.createElement("li");
-    item.textContent = "This scale is illustrative: the long edge of the photo is treated as 30 cm. It is not measured from the picture.";
+    const share = (measured.maxWidthPx / edge) * 100;
+    item.textContent = `Length is ${Math.round(measured.lengthPx)} px. The widest point is ${measured.maxWidthPx.toFixed(1)} px, about ${share.toFixed(1)}% of the long edge. Add a coin or tap a known length for a risk rating.`;
     reasons.appendChild(item);
   }
   draw();
@@ -296,17 +305,33 @@ function applyPointScale() {
 
 function setIllustrative() {
   if (!state.display || !canvas.width) return;
-  const longEdge = Math.max(canvas.width, canvas.height);
   state.scale = {
     mode: "illustrative",
-    mmPerPx: 300 / longEdge,
-    label: "Illustrative only: the long edge is treated as 30 cm.",
+    mmPerPx: null,
+    label: "Pixels only. Add a coin or tap a known length for a risk rating.",
   };
   state.points = [];
   state.armed = false;
   canvas.classList.remove("armed");
   $("scale-note").textContent = state.scale.label;
   if (state.measured) publish();
+}
+
+function applyDemoScale() {
+  const demo = state.demoScale;
+  if (!demo || !state.sourceWidth || !canvas.width) return;
+  const sx = canvas.width / state.sourceWidth;
+  const sy = canvas.height / state.sourceHeight;
+  $("reference").value = "27";
+  $("custom-wrap").hidden = true;
+  state.referenceMm = 27;
+  state.points = [
+    { x: demo.x1 * sx, y: demo.y1 * sy },
+    { x: demo.x2 * sx, y: demo.y2 * sy },
+  ];
+  state.armed = false;
+  canvas.classList.remove("armed");
+  applyPointScale();
 }
 
 function renderSamples() {
@@ -375,6 +400,7 @@ function wireScale() {
     $("scale-note").textContent = "Tap one end of the reference, then the other.";
     draw();
   });
+  $("use-demo").addEventListener("click", applyDemoScale);
   $("illustrative").addEventListener("click", setIllustrative);
   $("clear-scale").addEventListener("click", () => {
     state.scale = null;
@@ -520,7 +546,7 @@ function openSample(sample) {
   // so the pixel read for segmentation is allowed.
   image.crossOrigin = "anonymous";
   image.onload = () => {
-    loadImage(image, `${sample.credit}, ${sample.license}. ${sample.source}`);
+    loadImage(image, `${sample.credit}, ${sample.license}. ${sample.source}`, sample.demoScale || null);
   };
   image.onerror = () => {
     setStatus("This sample photo did not load. Check your connection and try again.");

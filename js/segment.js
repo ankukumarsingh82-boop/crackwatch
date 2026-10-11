@@ -1,3 +1,5 @@
+import { assessCrack } from "./confidence.js";
+
 /**
  * Crack segmentation for a phone photo of a wall, ceiling, pillar or floor.
  *
@@ -557,6 +559,9 @@ export function segmentCrack(image, options = {}) {
     mode = "blackhat";
   }
 
+  const verdict = assessCrack(mask, width, height);
+  if (!verdict.accepted) mask = new Uint8Array(width * height);
+
   return {
     mask,
     gray: flat,
@@ -564,6 +569,8 @@ export function segmentCrack(image, options = {}) {
     height,
     pixels: countMask(mask),
     mode,
+    accepted: verdict.accepted,
+    verdict,
   };
 }
 

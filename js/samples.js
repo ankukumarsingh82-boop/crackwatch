@@ -10,6 +10,16 @@ export const SAMPLES = [
     source: "https://commons.wikimedia.org/wiki/File:Cracked_Cream_Walls_(Unsplash).jpg",
   },
   {
+    id: "coin-demo",
+    src: "samples/coin-demo.jpg",
+    title: "Demo: coin close-up",
+    note: "Drawn for this demo. The pale disc is a ₹10 coin, 27 mm. Press “Use the coin in this demo” for a real rating.",
+    credit: "CrackWatch",
+    license: "MIT, drawn demo",
+    source: "samples/coin-demo.jpg",
+    demoScale: { x1: 82, y1: 92, x2: 154, y2: 92, mm: 27 },
+  },
+  {
     id: "tbilisi",
     src: "samples/stepped-tbilisi.jpg",
     title: "Stepped crack",

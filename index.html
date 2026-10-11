@@ -140,9 +140,12 @@
             Length (mm)
             <input id="custom-mm" type="number" min="1" step="0.1" value="100" />
           </label>
+          <button id="use-demo" class="btn" type="button" hidden>
+            Use the coin in this demo (27 mm)
+          </button>
           <button id="arm-scale" class="btn" type="button">Tap two points on the photo</button>
           <button id="illustrative" class="btn btn-ghost" type="button">
-            Illustrative scale: long edge = 30 cm
+            Long edge = 30 cm (pixels only, no rating)
           </button>
           <button id="clear-scale" class="btn btn-ghost" type="button">Clear scale</button>
           <p id="scale-note" class="hint">No scale set.</p>
@@ -159,12 +162,13 @@
 
       <section class="card growth" aria-label="Growth check">
         <div class="section-head">
-          <h2>Has it grown?</h2>
+          <h2>Has it grown? <span class="beta">Beta</span></h2>
           <p>
             Upload an older photo and a newer one of the same crack. CrackWatch
             lines them up with ORB features and a homography, then looks for crack
-            that is in the new photo and not the old one. The first comparison
-            downloads OpenCV (about 10 MB). The photo check above does not need it.
+            that is in the new photo and not the old one. This step is in beta:
+            the first comparison downloads OpenCV (about 10 MB) and stops after
+            10 seconds if it does not start. The photo check above does not need it.
           </p>
         </div>
         <div class="growth-grid">

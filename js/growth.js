@@ -22,8 +22,12 @@ export function loadOpenCv() {
       const timer = setTimeout(() => {
         clearInterval(poll);
         loading = null;
-        reject(new Error("OpenCV.js took too long to start. Check your connection and try again."));
-      }, 25000);
+        reject(
+          new Error(
+            "Growth check is in beta, and OpenCV didn’t start within 10 seconds. The photo check above still works. Wait a moment and try the comparison again.",
+          ),
+        );
+      }, 10000);
       const script = document.createElement("script");
       script.src = OPENCV_URLS[0];
       script.onload = () => {
@@ -34,7 +38,11 @@ export function loadOpenCv() {
         clearInterval(poll);
         script.remove();
         loading = null;
-        reject(new Error("OpenCV.js did not load, so the two photos could not be aligned."));
+        reject(
+          new Error(
+            "Growth check is in beta, and OpenCV didn’t load. The photo check above still works. Check your connection and try again.",
+          ),
+        );
       };
       document.head.appendChild(script);
     });

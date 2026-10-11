@@ -272,9 +272,8 @@ export function detectPattern(skeleton, width, height) {
 
 const LEVEL_COPY = {
   unscaled: {
-    title: "Scale needed",
-    summary:
-      "The outline is ready. Place a ₹10 coin (27 mm across) on the same surface, or tap two points a known distance apart, to turn pixels into millimetres.",
+    title: "No rating yet",
+    summary: "Add a coin or tap a known length for a risk rating.",
   },
   hairline: {
     title: "Hairline",
@@ -348,6 +347,21 @@ export function classifyRisk({ maxWidthMm, pattern = "unclear" }) {
     maxWidthMm,
   };
 }
+
+/** Millimetres and a risk badge come only from a coin or a two-point scale. */
+export function scaleAllowsRating(mode) {
+  return mode === "points";
+}
+
+export const NO_CRACK_RESULT = {
+  level: "empty",
+  title: "No clear crack found — try a closer photo",
+  summary:
+    "The marks here are short, broken up, or pointing in too many directions to treat as one crack.",
+  reasons: [
+    "Move closer so a real crack is a long line in the frame. Ivy, wood grain, cables and patterned plaster can look like cracks from far away.",
+  ],
+};
 
 export function rulesSummary() {
   return [

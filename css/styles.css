@@ -172,6 +172,20 @@ canvas { width: 100%; height: auto; display: block; }
 }
 
 .badge strong { display: block; font-family: var(--display); font-size: 1.7rem; letter-spacing: -0.03em; }
+.badge-unscaled strong, .badge-empty strong { font-size: 1.28rem; line-height: 1.25; }
+.beta {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--amber-soft);
+  color: var(--amber);
+  font-family: var(--font);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
 .badge p { margin-top: 6px; }
 
 .badge-hairline { color: var(--sage); background: var(--sage-soft); }

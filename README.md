@@ -8,13 +8,13 @@ It is a screening aid. It is not a structural inspection, and it does not replac
 
 ## Try it
 
-The site is static and is published on the `gh-pages` branch. Until GitHub Pages is switched on for the repository, the same files are served here:
+Live demo, pinned to this build (the first visit asks you to press **Open the page**):
 
-https://raw.githack.com/ankukumarsingh82-boop/crackwatch/gh-pages/index.html
+https://raw.githack.com/ankukumarsingh82-boop/crackwatch/LIVE_COMMIT/index.html
 
-The first visit shows that host’s “Open the page” notice. After that, the plaster sample loads on its own. Choose **Use 30 cm across the long edge** to see a rating. That scale is labelled illustrative: it is not measured from the picture.
+The plaster sample loads on its own and stays in pixels. It does not show a risk rating. Open **Demo: coin close-up** and press **Use the coin in this demo (27 mm)** for a rating in millimetres. The “long edge = 30 cm” button only keeps the pixel sizes.
 
-The intended GitHub Pages address is https://ankukumarsingh82-boop.github.io/crackwatch/ . In the repository settings, set Pages to deploy from the `gh-pages` branch, folder `/`.
+https://ankukumarsingh82-boop.github.io/crackwatch/ redirects to a custom domain and does not load. Use the link above.
 
 ## Why it matters
 
@@ -31,6 +31,7 @@ The outline is a crack-shaped computer-vision pipeline, not a general vision API
 3. **Multi-scale black-hat.** A greyscale closing fills dark lines thinner than the structuring element. Subtracting the original image leaves those lines and ignores wide stains. Radii are 1, 2, 4 and 7 pixels.
 4. **Frangi vesselness** (Frangi et al., MICCAI 1998) at two scales. Cracks are ridges. Round texture — plaster grain, concrete pores — is not, and the filter drops it.
 5. Hysteresis thresholding keeps strong ridge pixels and the weaker pixels connected to them. A one-pixel closing bridges small gaps. Components that are not elongated are discarded.
+6. **A no-crack gate.** The lines that remain are grouped into collinear runs. The photo is rejected when those runs are too short, when several long lines repeat (wood grain, cables, brick joints), or when they point in conflicting directions and none of them dominates. The card then says “No clear crack found — try a closer photo,” and it does not name a pattern or a rating.
 
 Raising sensitivity keeps fainter lines. "Crack is lighter than the wall" inverts the photo first, for the less common pale crack on a dark surface.
 
@@ -42,7 +43,7 @@ The scale comes from something in the same plane as the crack:
 - a ₹5 coin, 25 mm (2019 onwards) or 23 mm (older coins still in circulation)
 - any two points whose real distance you know
 
-Millimetres per pixel = known length ÷ pixel distance. The camera should be square to the wall. An illustrative control treats the long edge of the photo as 30 cm so the rating can be previewed; it is labelled as not a measurement.
+Millimetres per pixel = known length ÷ pixel distance. The camera should be square to the wall. Only that scale produces millimetres and a risk badge. The “long edge = 30 cm” control leaves the measurements in pixels and a note of how wide the line is relative to the frame. It does not rate the crack. The bundled **Demo: coin close-up** is a drawn wall with a 27 mm disc; one button applies that diameter.
 
 **Length.** The mask is thinned to a one-pixel centreline (Zhang–Suen, 1984). Orthogonal steps count as 1 px and diagonal steps as √2, so a slanted crack is not short-changed.
 
@@ -60,7 +61,7 @@ A stair-step is one crack that switches between across and down at least twice, 
 
 ### Growth check
 
-An older photo and a newer photo are aligned with ORB features and a RANSAC homography (OpenCV.js). Both are segmented in the shared frame. Crack pixels in the new mask that are not within one pixel of the old mask count as possible growth. The one-pixel margin is there because a small change in where you stood should not look like movement.
+An older photo and a newer photo are aligned with ORB features and a RANSAC homography (OpenCV.js 4.9, about 10 MB, loaded only for this step). The check is marked **beta**. If OpenCV has not started within 10 seconds, the page stops and says so. Both photos are segmented in the shared frame. Crack pixels in the new mask that are not within one pixel of the old mask count as possible growth. The one-pixel margin is there because a small change in where you stood should not look like movement. The file is not bundled: 10 MB is too large for the static demo.
 
 ## Tech stack
 
@@ -88,16 +89,18 @@ Sample photographs, bundled so the demo works without a camera:
 | Stepped crack, Tbilisi | Vladimer Shioshvili | CC BY-SA 2.0 | https://commons.wikimedia.org/wiki/File:Crack_in_the_wall.jpg |
 | Kilfane Church wall | A.-K. D. | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Crack_in_the_wall_(44892).jpg |
 | Larkbeare Road, Exeter | David Smith / Geograph Britain and Ireland | CC BY-SA 2.0 | https://commons.wikimedia.org/wiki/File:Crack_in_the_wall,_Larkbeare_Road,_Exeter_-_geograph.org.uk_-_5058687.jpg |
+| Demo: coin close-up | CrackWatch (drawn) | MIT | `samples/coin-demo.jpg` — a pale disc of known diameter, not a photograph |
 
 ## Limitations
 
 - It is not an inspection. A dangerous crack can be hard to see, and a harmless one can look dramatic in raking light.
 - Hairlines only show up if you are close. At 720 pixels across a whole wall, a 0.3 mm crack is a fraction of a pixel.
 - Width is read from the dark dip in the photo. Blur, shadow and a thick mask all push it wider. Treat the number as a screening estimate and repeat it with the same coin and the same distance.
-- Grout, formwork lines, cables and picture frames are thin and dark, so they can be outlined too. Mortar joints next to a real crack are the usual false lines.
+- A single long cable, or mortar that is fused to a real crack, can still be outlined. The gate is aimed at repeated, short, or randomly oriented texture. The Tbilisi sample still picks up mortar beside the crack.
+- The 30 cm control never produces a rating. Without a coin or a tapped length, the badge stays “No rating yet.”
 - Very wide cracks, larger than the black-hat kernels, may be traced at their edges rather than filled in.
 - Rough concrete and busy tile are weaker than a crack in smooth plaster.
-- The growth check fails when the two photos do not share enough wall around the crack, or when OpenCV.js cannot be loaded. The first comparison downloads about 10 MB and the library's startup can stall the tab; reload if that happens. The single-photo check does not use it.
+- The growth check is beta. It fails when the two photos do not share enough wall around the crack, or when OpenCV.js does not start within 10 seconds. The single-photo check does not use it.
 - Diagonal and stair-step calls are geometric. They are a reason to ask an engineer, not a diagnosis of shear or settlement.
 
 ## Run locally
@@ -110,7 +113,7 @@ python3 -m http.server 4173
 
 Open `http://localhost:4173`. The growth check needs network access the first time, to load OpenCV.js.
 
-Tests cover the measurement maths, the risk bands, the pattern rules, mask comparison, and segmentation of a synthetic crack:
+Tests cover the measurement maths, the risk bands, the pattern rules, the no-crack gate (brick, wood grain, foliage, wires, stucco, and the bundled crack photos), mask comparison, and segmentation of a synthetic crack:
 
 ```bash
 npm install

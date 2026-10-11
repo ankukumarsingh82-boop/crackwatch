@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { classifyRisk, detectPattern } from "../js/risk.js";
+import { classifyRisk, detectPattern, scaleAllowsRating } from "../js/risk.js";
 
 function skeleton(width, height, points) {
   const mask = new Uint8Array(width * height);
@@ -24,10 +24,17 @@ test("diagonal and stair-step patterns outrank a hairline width", () => {
   assert.ok(steps.reasons.some((line) => /stair/i.test(line)));
 });
 
+test("only a coin or two-point scale may produce a rating", () => {
+  assert.equal(scaleAllowsRating("points"), true);
+  assert.equal(scaleAllowsRating("illustrative"), false);
+  assert.equal(scaleAllowsRating(undefined), false);
+});
+
 test("no scale means no risk rating", () => {
   const result = classifyRisk({ maxWidthMm: null, pattern: "along" });
   assert.equal(result.level, "unscaled");
-  assert.equal(result.title, "Scale needed");
+  assert.equal(result.title, "No rating yet");
+  assert.match(result.summary, /coin or tap a known length/i);
 });
 
 test("a horizontal centreline is not called diagonal", () => {
