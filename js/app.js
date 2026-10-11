@@ -327,15 +327,10 @@ function renderSamples() {
     credit.className = "fine";
     credit.textContent = `${sample.credit} · ${sample.license}`;
     button.append(img, title, note, credit);
-    button.addEventListener("click", async () => {
+    button.addEventListener("click", () => {
       document.querySelectorAll(".sample").forEach((node) => node.classList.remove("selected"));
       button.classList.add("selected");
-      const image = new Image();
-      image.onload = () => {
-        loadImage(image, `${sample.credit}, ${sample.license}. ${sample.source}`);
-      };
-      image.alt = sample.title;
-      image.src = sample.src;
+      openSample(sample);
     });
     root.appendChild(button);
   }
@@ -519,10 +514,20 @@ wireScale();
 wireGrowth();
 wireDrop();
 
-const first = SAMPLES[0];
-const starter = new Image();
-starter.onload = () => {
-  document.querySelector(".sample")?.classList.add("selected");
-  loadImage(starter, `${first.credit}, ${first.license}. ${first.source}`);
-};
-starter.src = first.src;
+function openSample(sample) {
+  const image = new Image();
+  // Samples may be served from another host (a CDN redirect). Ask for CORS
+  // so the pixel read for segmentation is allowed.
+  image.crossOrigin = "anonymous";
+  image.onload = () => {
+    loadImage(image, `${sample.credit}, ${sample.license}. ${sample.source}`);
+  };
+  image.onerror = () => {
+    setStatus("This sample photo did not load. Check your connection and try again.");
+  };
+  image.alt = sample.title;
+  image.src = sample.src;
+}
+
+document.querySelector(".sample")?.classList.add("selected");
+openSample(SAMPLES[0]);
