@@ -10,7 +10,7 @@ It is a screening aid. It is not a structural inspection, and it does not replac
 
 Live demo, pinned to this build (the first visit asks you to press **Open the page**):
 
-https://raw.githack.com/ankukumarsingh82-boop/crackwatch/COMMIT_PIN/index.html
+https://raw.githack.com/ankukumarsingh82-boop/crackwatch/9d20543ddc995389ffbfd2295dfdd9d9d71338db/index.html
 
 The plaster photo loads on its own and stays in pixels. **Wood grain** is a drawn texture and should say no clear crack was found. **Synthetic: drawn coin** is not a photograph and does not detect a coin. Press **Apply the 27 mm scale** to use that known length. The “long edge = 30 cm” button only keeps the pixel sizes.
 

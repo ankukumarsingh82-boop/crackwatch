@@ -1,6 +1,6 @@
 # CrackWatch
 
-**Live demo:** https://raw.githack.com/ankukumarsingh82-boop/crackwatch/COMMIT_PIN/index.html
+**Live demo:** https://raw.githack.com/ankukumarsingh82-boop/crackwatch/9d20543ddc995389ffbfd2295dfdd9d9d71338db/index.html
 
 The first visit asks you to press **Open the page**.
 
