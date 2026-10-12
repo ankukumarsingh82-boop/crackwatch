@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="CrackWatch outlines a crack in a wall, ceiling, pillar or floor, estimates its length and width, and rates it with rules you can read."
+    />
+    <meta name="theme-color" content="#9d341f" />
+    <title>CrackWatch — check a crack from a photo</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,650&family=Outfit:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <header class="top">
+      <div class="brand">
+        <span class="mark" aria-hidden="true"></span>
+        <div>
+          <p class="eyebrow">Banana Hacks 2026</p>
+          <h1>CrackWatch</h1>
+        </div>
+      </div>
+      <p class="tagline">A photo check for cracks in walls, ceilings, pillars and floors.</p>
+    </header>
+
+    <main>
+      <section class="lede">
+        <p>
+          Photograph the crack, or try a sample. CrackWatch outlines it on the
+          picture, estimates length and width from a coin or a known length, and
+          rates it: hairline, monitor, or see a structural engineer.
+        </p>
+      </section>
+
+      <section class="workspace" aria-label="Check a photo">
+        <div class="stage card">
+          <div class="stage-bar">
+            <div class="file-actions">
+              <label class="btn">
+                Take a photo
+                <input id="camera-input" type="file" accept="image/*" capture="environment" />
+              </label>
+              <label class="btn btn-ghost">
+                Upload
+                <input id="file-input" type="file" accept="image/*" />
+              </label>
+            </div>
+            <label class="switch">
+              <input id="overlay-toggle" type="checkbox" checked />
+              <span>Show crack</span>
+            </label>
+          </div>
+
+          <div id="drop" class="frame">
+            <canvas id="photo" aria-label="Photo with the crack outlined"></canvas>
+            <div id="empty" class="empty">
+              <p>Drop a photo here, or start with a sample below.</p>
+              <p class="hint">Stand square to the wall. Include a ₹10 coin if you want millimetres.</p>
+            </div>
+            <p id="status" class="status" hidden></p>
+          </div>
+
+          <div class="tune">
+            <label for="sensitivity">Sensitivity <span id="sensitivity-value">55</span></label>
+            <input id="sensitivity" type="range" min="0" max="100" value="55" />
+            <label class="check">
+              <input id="invert" type="checkbox" />
+              Crack is lighter than the wall
+            </label>
+          </div>
+        </div>
+
+        <aside class="report card" aria-live="polite">
+          <p class="kicker">Rating</p>
+          <div id="badge" class="badge badge-unscaled">
+            <strong id="badge-title">Waiting for a photo</strong>
+            <p id="badge-summary">The outline and the numbers will land here.</p>
+          </div>
+
+          <dl class="stats">
+            <div>
+              <dt>Length</dt>
+              <dd id="stat-length">—</dd>
+            </div>
+            <div>
+              <dt>Typical width</dt>
+              <dd id="stat-typical">—</dd>
+            </div>
+            <div>
+              <dt>Widest point</dt>
+              <dd id="stat-width">—</dd>
+            </div>
+            <div>
+              <dt>Pattern</dt>
+              <dd id="stat-pattern">—</dd>
+            </div>
+          </dl>
+
+          <h2>Why this rating</h2>
+          <ul id="reasons" class="reasons">
+            <li>Width in millimetres needs a reference in the photo.</li>
+          </ul>
+          <p id="pattern-line" class="pattern-line"></p>
+          <p class="disclaimer">
+            CrackWatch is a photo aid, not a structural inspection. It does not
+            replace a qualified structural engineer. Lighting, focus, angle and
+            the reference all change the numbers.
+          </p>
+          <button id="save" class="btn btn-ghost" type="button" disabled>Save annotated photo</button>
+        </aside>
+      </section>
+
+      <section class="card scale-card" aria-label="Set a scale">
+        <div>
+          <h2>Turn pixels into millimetres</h2>
+          <p>
+            Put a coin flat on the same surface as the crack, or pick two points
+            you already know. The camera should be square to the wall. A ₹10 coin
+            is 27 mm across.
+          </p>
+        </div>
+        <div class="scale-controls">
+          <label>
+            Reference
+            <select id="reference">
+              <option value="27">₹10 coin · 27 mm</option>
+              <option value="25">₹5 coin, 2019 onwards · 25 mm</option>
+              <option value="23">₹5 coin, older · 23 mm</option>
+              <option value="custom">Custom length</option>
+            </select>
+          </label>
+          <label id="custom-wrap" hidden>
+            Length (mm)
+            <input id="custom-mm" type="number" min="1" step="0.1" value="100" />
+          </label>
+          <button id="use-demo" class="btn" type="button" hidden>
+            Apply the 27 mm scale
+          </button>
+          <button id="arm-scale" class="btn" type="button">Tap two points on the photo</button>
+          <button id="illustrative" class="btn btn-ghost" type="button">
+            Long edge = 30 cm (pixels only, no rating)
+          </button>
+          <button id="clear-scale" class="btn btn-ghost" type="button">Clear scale</button>
+          <p id="scale-note" class="hint">No scale set.</p>
+        </div>
+      </section>
+
+      <section aria-label="Sample photos">
+        <div class="section-head">
+          <h2>Try a sample</h2>
+          <p>
+            Real photos are credited under the picture. Wood grain and the drawn
+            coin are synthetic. The coin is a known length you apply. It is not
+            detected.
+          </p>
+        </div>
+        <div id="samples" class="samples"></div>
+      </section>
+
+      <section class="card growth" aria-label="Growth check">
+        <div class="section-head">
+          <h2>Has it grown? <span class="beta">Beta</span></h2>
+          <p>
+            Upload an older photo and a newer one of the same crack. CrackWatch
+            lines them up with ORB features and a homography, then looks for crack
+            that is in the new photo and not the old one. This step is in beta:
+            the first comparison downloads OpenCV (about 10 MB) and stops after
+            10 seconds if it does not start. The photo check above does not need it.
+          </p>
+        </div>
+        <div class="growth-grid">
+          <label class="drop-mini">
+            Older photo
+            <input id="older-input" type="file" accept="image/*" />
+            <span id="older-name">None yet</span>
+          </label>
+          <label class="drop-mini">
+            Newer photo
+            <input id="newer-input" type="file" accept="image/*" />
+            <span id="newer-name">None yet</span>
+          </label>
+        </div>
+        <button id="compare" class="btn" type="button">Align and compare</button>
+        <p id="growth-status" class="hint"></p>
+        <canvas id="growth-view" hidden></canvas>
+        <div id="growth-result" class="growth-result" hidden></div>
+      </section>
+
+      <section class="card rules">
+        <h2>How the rating is decided</h2>
+        <ul id="rules"></ul>
+        <p>
+          The outline is a crack-shaped filter, not a chat model: a multi-scale
+          black-hat to lift thin dark lines, and a Frangi ridge filter to ignore
+          round texture. Length is the centreline. Width is the dark dip across
+          that line. The rating uses the widest point, plus the pattern.
+        </p>
+      </section>
+    </main>
+
+    <footer>
+      <p>
+        Runs entirely in your browser. No photo is uploaded. Not a substitute for
+        a structural engineer.
+      </p>
+      <p id="credit-line"></p>
+    </footer>
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>
