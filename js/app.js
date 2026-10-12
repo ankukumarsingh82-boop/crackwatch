@@ -56,6 +56,29 @@ function setStatus(text) {
   node.textContent = text || "";
 }
 
+function clearResult() {
+  state.segmentation = null;
+  state.measured = null;
+  state.pattern = null;
+  state.risk = null;
+  $("badge").className = "badge badge-unscaled";
+  $("badge-title").textContent = "Waiting for a photo";
+  $("badge-summary").textContent = "The outline and the numbers will land here.";
+  $("stat-length").textContent = "—";
+  $("stat-typical").textContent = "—";
+  $("stat-width").textContent = "—";
+  $("stat-pattern").textContent = "—";
+  $("pattern-line").textContent = "";
+  const reasons = $("reasons");
+  reasons.replaceChildren();
+  const item = document.createElement("li");
+  item.textContent = "Width in millimetres needs a reference in the photo.";
+  reasons.appendChild(item);
+  $("save").disabled = true;
+  canvas.setAttribute("aria-label", "Photo with the crack outlined");
+  if (state.display) draw();
+}
+
 function fitSize(width, height, maxEdge) {
   const scale = Math.min(1, maxEdge / Math.max(width, height));
   return {
@@ -102,6 +125,7 @@ async function loadImage(image, credit, demoScale = null) {
   canvas.classList.add("ready");
   $("empty").hidden = true;
   $("credit-line").textContent = credit || "";
+  clearResult();
   await analyse();
   $("use-demo").hidden = !state.demoScale;
 }
@@ -145,11 +169,21 @@ async function analyse() {
     state.measured = measured;
     state.pattern = detectPattern(measured.skeleton, segmentation.width, segmentation.height);
     publish();
+    setStatus("");
   } catch (error) {
-    setStatus(error.message || "The photo could not be read.");
+    const message = error.message || "The photo could not be read.";
+    clearResult();
+    setStatus(message);
+    $("badge").className = "badge badge-empty";
+    $("badge-title").textContent = "Photo not read";
+    $("badge-summary").textContent = message;
+    const reasons = $("reasons");
+    reasons.replaceChildren();
+    const item = document.createElement("li");
+    item.textContent = message;
+    reasons.appendChild(item);
   } finally {
     state.busy = false;
-    setStatus("");
     if (analyseQueued) {
       analyseQueued = false;
       analyse();
@@ -371,13 +405,18 @@ function renderRules() {
   }
 }
 
+let photoRequest = 0;
+
 async function onFile(file) {
   if (!file) return;
+  const request = ++photoRequest;
   document.querySelectorAll(".sample").forEach((node) => node.classList.remove("selected"));
   try {
     const image = await readFile(file);
+    if (request !== photoRequest) return;
     await loadImage(image, "Your photo. Nothing was uploaded.");
   } catch (error) {
+    if (request !== photoRequest) return;
     setStatus(error.message);
   }
 }
@@ -429,11 +468,20 @@ function wireScale() {
 
 function wireGrowth() {
   const bind = (input, slot, label) => {
+    let requestId = 0;
     input.addEventListener("change", async () => {
       const file = input.files?.[0];
       if (!file) return;
-      slot.image = await readFile(file);
-      label.textContent = file.name;
+      const request = ++requestId;
+      try {
+        const image = await readFile(file);
+        if (request !== requestId) return;
+        slot.image = image;
+        label.textContent = file.name;
+      } catch (error) {
+        if (request !== requestId) return;
+        throw error;
+      }
     });
   };
   bind($("older-input"), older, $("older-name"));
@@ -450,7 +498,7 @@ function wireGrowth() {
     resultBox.hidden = true;
     view.hidden = true;
     try {
-      const result = await compareGrowth(older.image, newer.image, state.sensitivity);
+      const result = await compareGrowth(older.image, newer.image, state.sensitivity, state.invert);
       if (!result.ok) {
         status.textContent = result.message;
         return;
@@ -542,14 +590,17 @@ wireGrowth();
 wireDrop();
 
 function openSample(sample) {
+  const request = ++photoRequest;
   const image = new Image();
   // Samples may be served from another host (a CDN redirect). Ask for CORS
   // so the pixel read for segmentation is allowed.
   image.crossOrigin = "anonymous";
   image.onload = () => {
+    if (request !== photoRequest) return;
     loadImage(image, `${sample.credit}, ${sample.license}. ${sample.source}`, sample.demoScale || null);
   };
   image.onerror = () => {
+    if (request !== photoRequest) return;
     setStatus("This sample photo did not load. Check your connection and try again.");
   };
   image.alt = sample.title;

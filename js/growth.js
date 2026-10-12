@@ -64,12 +64,12 @@ function canvasToMat(cv, canvas) {
   return cv.imread(canvas);
 }
 
-function maskFromCanvas(canvas, sensitivity) {
+function maskFromCanvas(canvas, sensitivity, invert) {
   const context = canvas.getContext("2d", { willReadFrequently: true });
   const image = context.getImageData(0, 0, canvas.width, canvas.height);
   return segmentCrack(
     { data: image.data, width: canvas.width, height: canvas.height },
-    { sensitivity },
+    { sensitivity, invert },
   );
 }
 
@@ -77,7 +77,7 @@ function maskFromCanvas(canvas, sensitivity) {
  * Align an older photo onto a newer one with ORB features and a RANSAC
  * homography, then compare the two crack masks.
  */
-export async function compareGrowth(olderSource, newerSource, sensitivity = 0.55) {
+export async function compareGrowth(olderSource, newerSource, sensitivity = 0.55, invert = false) {
   const cv = await loadOpenCv();
   const olderCanvas = fitCanvas(olderSource, 640);
   const newerCanvas = fitCanvas(newerSource, 640);
@@ -149,8 +149,20 @@ export async function compareGrowth(olderSource, newerSource, sensitivity = 0.55
       };
     }
 
-    const olderSeg = maskFromCanvas(olderCanvas, sensitivity);
-    const newerSeg = maskFromCanvas(newerCanvas, sensitivity);
+    const olderSeg = maskFromCanvas(olderCanvas, sensitivity, invert);
+    const newerSeg = maskFromCanvas(newerCanvas, sensitivity, invert);
+    if (olderSeg.accepted === false || newerSeg.accepted === false) {
+      const which =
+        olderSeg.accepted === false && newerSeg.accepted === false
+          ? "either photo"
+          : olderSeg.accepted === false
+            ? "the older photo"
+            : "the newer photo";
+      return {
+        ok: false,
+        message: `No clear crack in ${which}, so this is not reported as growth. A failed outline is empty and would look like the crack changed. Retake it with the crack in focus.`,
+      };
+    }
     const olderMaskMat = cv.matFromArray(olderCanvas.height, olderCanvas.width, cv.CV_8UC1, olderSeg.mask);
     warpedMask = new cv.Mat();
     cv.warpPerspective(
